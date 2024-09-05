@@ -1,0 +1,39 @@
+.product-item {
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    overflow: hidden;
+    width: 150px;
+    margin: 10px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .product-image img {
+    width: 100%;
+    height: auto;
+  }
+  
+  .product-info {
+    padding: 10px;
+  }
+  
+  .product-name {
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 5px;
+  }
+  
+  .product-price {
+    display: flex;
+    align-items: center;
+  }
+  
+  
+  .price-original {
+    font-size: 20px;
+    color: #ff5722;
+    margin-left: 5px;
+  }
+  
+  
+ 
