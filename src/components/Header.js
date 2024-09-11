@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import './Header.css';
 import logo from '../assets/images/logo.png';
 import { FaUserCircle, FaShoppingCart, FaSearch, FaTachometerAlt } from 'react-icons/fa';
@@ -7,7 +7,6 @@ import { CartContext } from '../context/CartContext';
 
 function Header({ setSearchTerm }) {
   const { cart } = useContext(CartContext);
-  const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
