@@ -2,51 +2,57 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Login.css';
 import { useNavigate } from 'react-router-dom';
+
 function Login() {
-const [formData, setFormData] = useState({
-  email: '',
-  password: '',
-});
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
 
-const navigate = useNavigate();
+  const navigate = useNavigate();
 
-const handleChange = (e) => {
-  setFormData({ ...formData, [e.target.name]: e.target.value });
-};
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  try {
-    const response = await fetch('http://localhost:5002/api/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: formData.email,
-        password: formData.password,
-      }),
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('userId', data.userId); 
-      localStorage.setItem('isAdmin', data.isAdmin); // Store admin status
-      navigate(data.isAdmin ? '/admin/dashboard' : '/account'); // Redirect based on admin status// Save user ID for later use
-      alert('Login successful!');
-      navigate('/account'); // Redirect to the account page
-    } else {
-      alert('Login failed. Please check your credentials.');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    try {
+      const response = await fetch('http://localhost:5002/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('userId', data.userId);
+        localStorage.setItem('isAdmin', data.isAdmin); // Save admin status
+  
+        if (data.isAdmin) {
+          alert('Admin login successful!');
+          navigate('/admin/dashboard'); // Redirect to the admin dashboard if admin
+        } else {
+          alert('Login successful!');
+          navigate('/account'); // Redirect to the user account page if not admin
+        }
+      } else {
+        alert('Login failed. Please check your credentials.');
+      }
+    } catch (err) {
+      console.error('Error:', err);
+      alert('Login failed due to a server error.');
     }
-  } catch (err) {
-    console.error('Error:', err);
-    alert('Login failed due to a server error.');
-  }
-};
+  };
 
-return (  
+  return (
     <div className="login-container">
       <h1>Login</h1>
       <form onSubmit={handleSubmit} className="login-form">

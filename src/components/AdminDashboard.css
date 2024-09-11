@@ -1,0 +1,63 @@
+/* Container for the admin dashboard */
+.admin-dashboard-container {
+    margin: 20px auto;
+    padding: 20px;
+    max-width: 900px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  /* Dashboard heading */
+  .admin-dashboard-container h1 {
+    font-size: 32px;
+    color: #4CAF50;
+    margin-bottom: 30px;
+  }
+  
+  /* Admin navigation */
+  .admin-nav ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .admin-nav li {
+    margin: 15px 0;
+  }
+  
+  .admin-nav a {
+    text-decoration: none;
+    font-size: 20px;
+    color: #333;
+    padding: 10px 20px;
+    border-radius: 6px;
+    background-color: #ffffff;
+    display: inline-block;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .admin-nav a:hover {
+    background-color: #4CAF50;
+    color: #fff;
+  }
+  
+  /* Icon styling */
+  .admin-nav i {
+    margin-right: 10px;
+    color: #4CAF50; /* Icon color */
+    font-size: 20px; /* Icon size */
+    vertical-align: middle;
+  }
+  
+  /* Responsive adjustments */
+  @media screen and (max-width: 768px) {
+    .admin-dashboard-container {
+      padding: 15px;
+    }
+  
+    .admin-nav a {
+      font-size: 18px;
+    }
+  }

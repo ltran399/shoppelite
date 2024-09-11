@@ -15,26 +15,115 @@ function Checkout() {
     cvv: '',
   });
 
-  const { clearCart } = useContext(CartContext); // Get the clearCart function from context
+  const [loading, setLoading] = useState(false); // Loading state
+  const { cart, clearCart } = useContext(CartContext); // Access cart and clearCart from context
   const navigate = useNavigate();
 
+  // Retrieve userId from localStorage
+  const userId = localStorage.getItem('userId');
+  const token = localStorage.getItem('token');
+
+  // Update form data when input changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  // Validate form fields (example)
+  const validateFields = () => {
+    const { creditCardNumber, expirationDate, cvv } = formData;
+
+    // Simple regex validation for credit card, expiration (MM/YY), and CVV
+    const cardRegex = /^[0-9]{16}$/;
+    const expirationRegex = /^(0[1-9]|1[0-2])\/?([0-9]{2})$/;
+    const cvvRegex = /^[0-9]{3,4}$/;
+
+    if (!cardRegex.test(creditCardNumber)) {
+      alert('Invalid credit card number.');
+      return false;
+    }
+    if (!expirationRegex.test(expirationDate)) {
+      alert('Invalid expiration date. Use MM/YY format.');
+      return false;
+    }
+    if (!cvvRegex.test(cvv)) {
+      alert('Invalid CVV.');
+      return false;
+    }
+    return true;
+  };
+
+  // Submit order when the form is submitted
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    clearCart(); // Clear the cart after successful checkout
-    navigate('/confirmation'); // Redirect to the confirmation page
+
+    // Ensure userId exists, if not, redirect to login
+    if (!userId) {
+      alert('User is not logged in.');
+      navigate('/login'); // Redirect to login page
+      return;
+    }
+
+    // Ensure cart exists
+    if (cart && cart.length === 0) {
+      alert('Your cart is empty.');
+      return;
+    }
+
+    // Validate form fields
+    if (!validateFields()) {
+      return;
+    }
+
+    // Create the order object to send to the backend
+    const orderDetails = {
+      userId,
+      items: cart,
+      totalAmount: cart?.reduce((total, item) => total + item.price * item.quantity, 0),
+      shippingAddress: `${formData.address}, ${formData.country}, ZIP: ${formData.zip}`,
+      status: 'Pending',
+    };
+
+    setLoading(true); // Show loading state
+
+    try {
+      const response = await fetch('http://localhost:5002/api/place-order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(orderDetails),
+      });
+
+      const data = await response.json();
+      setLoading(false); // Hide loading state
+
+      if (response.ok) {
+        console.log('Order placed successfully:', data);
+
+        // Clear the cart after order placement
+        clearCart();
+
+        // Redirect to confirmation page
+        navigate('/confirmation');
+      } else {
+        console.error('Order placement failed:', data);
+        alert('Order placement failed. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error placing order:', error);
+      alert('An error occurred while placing the order. Please try again.');
+      setLoading(false); // Hide loading state
+    }
   };
 
   return (
     <div className="checkout-container">
       <h1>Checkout</h1>
       <form onSubmit={handleSubmit} className="checkout-form">
+        {/* Personal Information Section */}
         <div className="form-section personal-info">
           <h2>Personal Information</h2>
-
           <div className="input-group">
             <label htmlFor="firstName">First Name</label>
             <input
@@ -84,7 +173,7 @@ function Checkout() {
           </div>
 
           <div className="input-group">
-            <label htmlFor="zip">Zip</label>
+            <label htmlFor="zip">Zip Code</label>
             <input
               id="zip"
               type="text"
@@ -96,6 +185,7 @@ function Checkout() {
           </div>
         </div>
 
+        {/* Credit Card Information Section */}
         <div className="form-section">
           <h2>Credit Card Information</h2>
 
@@ -103,7 +193,7 @@ function Checkout() {
             <label htmlFor="creditCardNumber">Credit Card Number</label>
             <input
               id="creditCardNumber"
-              type="text"
+              type="password" // Mask credit card number
               name="creditCardNumber"
               value={formData.creditCardNumber}
               onChange={handleChange}
@@ -118,6 +208,7 @@ function Checkout() {
               type="text"
               name="expirationDate"
               value={formData.expirationDate}
+              placeholder="MM/YY"
               onChange={handleChange}
               required
             />
@@ -127,7 +218,7 @@ function Checkout() {
             <label htmlFor="cvv">CVV</label>
             <input
               id="cvv"
-              type="text"
+              type="password" // Mask CVV
               name="cvv"
               value={formData.cvv}
               onChange={handleChange}
@@ -136,7 +227,12 @@ function Checkout() {
           </div>
         </div>
 
-        <button type="submit" className="checkout-button">Checkout</button>
+        {loading && <p>Placing your order...</p>}
+
+        {/* Submit Button */}
+        <button type="submit" className="checkout-button" disabled={loading}>
+          {loading ? 'Placing Order...' : 'Place Order'}
+        </button>
       </form>
     </div>
   );

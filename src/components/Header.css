@@ -2,7 +2,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #ff5722; /* Adjust to your preferred color */
+  background-color: #ff5722; /* Shopee Orange */
   padding: 10px 20px;
 }
 
@@ -16,7 +16,7 @@
 }
 
 .header-center {
-  flex: 1; /* This allows the search bar to take up available space */
+  flex: 1; /* Allows the search bar to take up available space */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -30,26 +30,27 @@
 
 .search-input {
   width: 100%;
-  padding: 8px 12px; /* Adjust padding for better spacing */
-  border: 2px solid #fff; /* Match border color with the header or make it more subtle */
+  padding: 8px 12px;
+  border: 2px solid #fff; /* Match border color with the header */
   border-radius: 4px;
   font-size: 16px;
-  box-sizing: border-box; /* Ensures padding doesn't affect width */
+  box-sizing: border-box;
   outline: none;
+  transition: border-color 0.3s ease;
 }
 
 .search-input:focus {
-  border-color: #ffcc00; /* Add focus border color if needed */
+  border-color: #ffcc00; /* Focus border color */
 }
 
 .search-icon {
   position: absolute;
-  right: 10px; /* Position the icon on the right inside the input */
+  right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  color: #fff; /* Match the icon color with the header text color */
+  color: #fff; /* Match the icon color with the header */
   pointer-events: none; /* Ensure the icon doesn't interfere with typing */
-  font-size: 16px; /* Adjust icon size if necessary */
+  font-size: 16px;
 }
 
 .header-right {
@@ -62,10 +63,11 @@
   color: white;
   margin-left: 20px;
   cursor: pointer;
+  transition: color 0.3s ease; /* Smooth transition on hover */
 }
 
 .header-icon:hover {
-  color: #ddd; /* Optional: Change color on hover */
+  color: #ddd; /* Change color on hover */
 }
 
 .cart-link {
@@ -77,9 +79,64 @@
   top: -10px;
   right: -10px;
   background-color: red; /* Background color of the cart count bubble */
-  color: white; /* Set the text color to white */
+  color: white;
   border-radius: 50%;
   padding: 2px 6px;
   font-size: 12px;
   font-weight: bold;
+}
+.admin-link {
+  margin-left: 8px; /* Add space to the left of the admin dashboard link */
+}
+
+.admin-dashboard-icon {
+  font-size: 24px; /* Adjust the size of the admin dashboard icon */
+  color: white;
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+  .header {
+    padding: 8px 16px; /* Adjust padding for smaller screens */
+  }
+
+  .logo {
+    height: 35px; /* Adjust logo size on smaller screens */
+  }
+
+  .search-container {
+    max-width: 300px; /* Reduce search bar width on smaller screens */
+  }
+
+  .header-right {
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 500px) {
+  .header {
+    flex-direction: column; /* Stack items vertically on small screens */
+    padding: 10px;
+  }
+
+  .header-left, .header-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .search-container {
+    max-width: 100%;
+    margin: 10px 0;
+  }
+
+  .header-icon {
+    font-size: 22px;
+    margin-left: 15px;
+  }
+
+  .cart-count {
+    top: -5px;
+    right: -5px;
+    font-size: 10px;
+  }
 }

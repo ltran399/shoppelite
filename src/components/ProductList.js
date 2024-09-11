@@ -72,11 +72,9 @@ function ProductList({ searchTerm }) {
   ];
 
   // Filter products based on search term
-  const filteredProducts = searchTerm
-    ? products.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : products;
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="product-list-container">

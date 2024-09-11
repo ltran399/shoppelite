@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Irrelevant Review Detector</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { max-width: 500px; margin: auto; padding: 20px; }
+        .result { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Irrelevant Review Detector</h1>
+        <textarea id="reviewInput" rows="4" cols="50" placeholder="Enter review here..."></textarea>
+        <button onclick="analyzeReview()">Analyze</button>
+        <div id="result" class="result"></div>
+    </div>
+    
+    <script>
+        function analyzeReview() {
+            const review = document.getElementById('reviewInput').value;
+            fetch('http://127.0.0.1:5000/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ review: review })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const result = data.is_irrelevant ? "Irrelevant" : "Relevant";
+                document.getElementById('result').innerHTML = "Result: " + result;
+            });
+        }
+    </script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Customer Registration</title>
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Register</h1>
+        <input type="text" id="username" placeholder="Username"><br><br>
+        <input type="email" id="email" placeholder="Email"><br><br>
+        <input type="password" id="password" placeholder="Password"><br><br>
+        <button onclick="register()">Register</button>
+        <div id="message"></div>
+    </div>
+
+    <script>
+        function register() {
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            fetch('http://127.0.0.1:5000/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, email, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Registration successful! Please log in.');
+                    window.location.href = 'login.html';
+                } else {
+                    document.getElementById('message').innerHTML = data.message;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin & Customer - Reviews</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+      .container {
+        max-width: 800px;
+        margin: auto;
+        padding: 20px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: center;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+        margin-top: 20px;
+      }
+      label, input, textarea {
+        margin-bottom: 10px;
+        font-size: 16px;
+      }
+      button {
+        padding: 10px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      .confirmation {
+        margin-top: 20px;
+        color: green;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="admin-root"></div>
+    <div id="customer-root"></div>
+
+
+    <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+    <script type="text/babel">
+      const AdminPage = () => {
+        const [evaluations, setEvaluations] = React.useState([]);
+
+        React.useEffect(() => {
+          const loadEvaluations = async () => {
+            try {
+              const response = await fetch("http://127.0.0.1:5000/evaluations", {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
+              });
+              const data = await response.json();
+              setEvaluations(data);
+            } catch (error) {
+              console.error("Error fetching evaluations:", error);
+            }
+          };
+
+          loadEvaluations();
+        }, []);
+
+        return (
+          <div className="container">
+            <h1>Admin - Customer Evaluations</h1>
+            <table>
+              <thead>
+                <tr>
+                  <th>Customer</th>
+                  <th>Review</th>
+                  <th>Result</th>
+                </tr>
+              </thead>
+              <tbody>
+                {evaluations.length > 0 ? (
+                  evaluations.map((evaluation, index) => (
+                    <tr key={index}>
+                      <td>{evaluation.customer}</td>
+                      <td>{evaluation.review}</td>
+                      <td>{evaluation.is_irrelevant ? "Irrelevant" : "Relevant"}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="3">No evaluations available</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        );
+      };
+      const CustomerPage = () => {
+        const [name, setName] = React.useState('');
+        const [review, setReview] = React.useState('');
+        const [submitted, setSubmitted] = React.useState(false);
+        const [error, setError] = React.useState('');
+
+        const handleSubmit = async (e) => {
+          e.preventDefault();
+
+          setSubmitted(false);
+          setError('');
+
+          if (name && review) {
+            try {
+              const response = await fetch("http://127.0.0.1:5000/reviews", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ customer: name, review: review }),
+              });
+
+              if (response.ok) {
+                setSubmitted(true);
+                setName('');        
+                setReview('');
+              } else {
+                setError('Failed to submit the review.');
+              }
+            } catch (error) {
+              setError('An error occurred. Please try again.');
+            }
+          } else {
+            setError('Please fill in both fields.');
+          }
+        };
+
+        return (
+          <div className="container">
+            <h1>Customer - Submit Review</h1>
+            <form onSubmit={handleSubmit}>
+              <label htmlFor="name">Your Name:</label>
+              <input
+                type="text"
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter your name"
+              />
+              <label htmlFor="review">Your Review:</label>
+              <textarea
+                id="review"
+                value={review}
+                onChange={(e) => setReview(e.target.value)}
+                placeholder="Enter your review"
+                rows="5"
+              ></textarea>
+              <button type="submit">Submit Review</button>
+            </form>
+            {submitted && <p className="confirmation">Review submitted successfully!</p>}
+            {error && <p className="error" style={{ color: 'red' }}>{error}</p>}
+          </div>
+        );
+      };
+
+      ReactDOM.render(<AdminPage />, document.getElementById("admin-root"));
+      ReactDOM.render(<CustomerPage />, document.getElementById("customer-root"));
+    </script>
+  </body>
+</html>

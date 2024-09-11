@@ -1,19 +1,19 @@
-import React, {useContext} from 'react';
-import { Link, useNavigate} from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import './Header.css';
 import logo from '../assets/images/logo.png';
-import { FaUserCircle, FaShoppingCart, FaSearch } from 'react-icons/fa'; // Importing the search icon
+import { FaUserCircle, FaShoppingCart, FaSearch, FaTachometerAlt } from 'react-icons/fa';
 import { CartContext } from '../context/CartContext';
+
 function Header({ setSearchTerm }) {
-  const { cart } = useContext(CartContext); // Use CartContext to access the cart
+  const { cart } = useContext(CartContext);
   const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // State to check if user is logged in
-  const [isAdmin, setIsAdmin] = useState(false); // State to check if the user is an admin
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('token'); // Check if the user is logged in
-    const adminStatus = localStorage.getItem('isAdmin'); // Check if the user is an admin
+    const token = localStorage.getItem('token');
+    const adminStatus = localStorage.getItem('isAdmin');
     if (token) {
       setIsLoggedIn(true);
     }
@@ -21,15 +21,6 @@ function Header({ setSearchTerm }) {
       setIsAdmin(true);
     }
   }, []);
-
-  // Handle account icon click based on login status
-  const handleAccountClick = () => {
-    if (isLoggedIn) {
-      navigate('/account');
-    } else {
-      navigate('/login');
-    }
-  };
 
   return (
     <header className="header">
@@ -45,7 +36,7 @@ function Header({ setSearchTerm }) {
           <input
             type="text"
             placeholder="Search for products..."
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => setSearchTerm(e.target.value)} // Update search term on input change
             className="search-input"
           />
           <FaSearch className="search-icon" />
@@ -53,28 +44,25 @@ function Header({ setSearchTerm }) {
       </div>
 
       <div className="header-right">
-        {/* Account button */}
-        <button 
-          onClick={handleAccountClick} 
-          style={{
-            backgroundColor: '#ff5722',
-            color: '#fff',
-            border: 'none',
-            padding: '10px 20px',
-            borderRadius: '5px',
-          }}
-        >
-          <FaUserCircle className="header-icon account-icon" />
-        </button>
-
-        {/* Admin dashboard link visible only to admins */}
-        {isAdmin && (
-          <Link to="/admin/dashboard" className="admin-link">
-            Admin Dashboard
+        {/* Conditionally render the account or login link based on isLoggedIn */}
+        {isLoggedIn ? (
+          <Link to="/account" className="account-button">
+            <FaUserCircle className="header-icon account-icon" />
+          </Link>
+        ) : (
+          <Link to="/login" className="account-button">
+            <FaUserCircle className="header-icon account-icon" />
           </Link>
         )}
 
-        {/* Shopping cart icon */}
+        {/* Admin Dashboard link visible only to admins */}
+        {isAdmin && (
+          <Link to="/admin/dashboard" className="admin-link" title="Admin Dashboard">
+            <FaTachometerAlt className="header-icon admin-dashboard-icon" />
+          </Link>
+        )}
+
+        {/* Shopping Cart */}
         <Link to="/cart" className="cart-link">
           <FaShoppingCart className="header-icon cart-icon" />
           {cart.length > 0 && <span className="cart-count">{cart.length}</span>}
