@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import './AdminReviews.css';
 
 function AdminReviews() {
@@ -6,11 +6,8 @@ function AdminReviews() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchReviews();
-  }, []);
-
-  const fetchReviews = async () => {
+  // Wrap fetchReviews in useCallback to avoid re-creation on every render
+  const fetchReviews = useCallback(async () => {
     const token = localStorage.getItem('token');
     try {
       const response = await fetch('http://localhost:5002/api/admin/reviews', {
@@ -35,7 +32,7 @@ function AdminReviews() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []); // Empty array means no dependencies, so the function will only be created once
 
   const fetchRelevanceScore = async (reviewText) => {
     try {
@@ -89,6 +86,10 @@ function AdminReviews() {
     }
     return relevanceScore < 50 ? { backgroundColor: 'red', color: 'white' } : { backgroundColor: 'green', color: 'white' };
   };
+
+  useEffect(() => {
+    fetchReviews(); // Call the wrapped fetchReviews
+  }, [fetchReviews]); // Include fetchReviews as a dependency
 
   if (loading) {
     return <div>Loading...</div>;
